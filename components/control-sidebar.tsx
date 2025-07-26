@@ -21,14 +21,13 @@ import {
 } from "@/data/materials";
 import CustomSlider from "./custom-slider";
 
-
 export default function ControlSidebar({
   roomData,
   onUpdateRoomData,
-}:  {
+}: {
   roomData: RoomData;
   onUpdateRoomData: (section: keyof RoomData, data: any) => void;
-} ){
+}) {
   const getMaxWindows = () => {
     const availableWalls = [];
 
@@ -97,24 +96,17 @@ export default function ControlSidebar({
                   Room Dimensions
                 </h3>
                 <div className="space-y-2">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <Label className="text-xs text-gray-600">Length</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {roomData.dimensions.length}m
-                      </Badge>
-                    </div>
-                    <Slider
-                      value={[roomData.dimensions.length]}
-                      onValueChange={([value]) =>
-                        onUpdateRoomData("dimensions", { length: value })
-                      }
-                      min={2}
-                      max={15}
-                      step={0.5}
-                      className="h-1"
-                    />
-                  </div>
+                  <CustomSlider
+                    label={"Length"}
+                    displayValue={roomData.dimensions.length + "m"}
+                    value={roomData.dimensions.length}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("dimensions", { length: value })
+                    }
+                    min={2}
+                    max={15}
+                    step={0.5}
+                  />
                   <CustomSlider
                     label={"Width"}
                     displayValue={roomData.dimensions.width + "m"}
@@ -206,25 +198,17 @@ export default function ControlSidebar({
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <Label className="text-xs text-gray-600">Thickness</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {roomData.walls.thickness.toFixed(2)}m
-                      </Badge>
-                    </div>
-                    <Slider
-                      value={[roomData.walls.thickness]}
-                      onValueChange={([value]) =>
-                        onUpdateRoomData("walls", { thickness: value })
-                      }
-                      min={0.1}
-                      max={0.5}
-                      step={0.01}
-                      className="h-1"
-                    />
-                  </div>
+                  <CustomSlider
+                    label="Thickness"
+                    displayValue={roomData.walls.thickness.toFixed(2) + "m"}
+                    value={roomData.walls.thickness}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("walls", { thickness: value })
+                    }
+                    min={0.1}
+                    max={0.5}
+                    step={0.01}
+                  />
 
                   <div>
                     <Label className="text-xs text-gray-600">Insulation:</Label>
@@ -258,28 +242,21 @@ export default function ControlSidebar({
                   </div>
 
                   {roomData.walls.insulation !== "none" && (
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <Label className="text-xs text-gray-600">
-                          Insulation Thickness
-                        </Label>
-                        <Badge variant="outline" className="text-xs">
-                          {roomData.walls.insulationThickness.toFixed(2)}m
-                        </Badge>
-                      </div>
-                      <Slider
-                        value={[roomData.walls.insulationThickness]}
-                        onValueChange={([value]) =>
-                          onUpdateRoomData("walls", {
-                            insulationThickness: value,
-                          })
-                        }
-                        min={0.01}
-                        max={0.2}
-                        step={0.01}
-                        className="h-1"
-                      />
-                    </div>
+                    <CustomSlider
+                      label="Insulation Thickness"
+                      displayValue={
+                        roomData.walls.insulationThickness.toFixed(2) + "m"
+                      }
+                      value={roomData.walls.insulationThickness}
+                      onValueChange={(value) =>
+                        onUpdateRoomData("walls", {
+                          insulationThickness: value,
+                        })
+                      }
+                      min={0.01}
+                      max={0.2}
+                      step={0.01}
+                    />
                   )}
                 </div>
               </div>
@@ -296,72 +273,48 @@ export default function ControlSidebar({
                   Windows
                 </h3>
                 <div className="space-y-2">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <Label className="text-xs text-gray-600">Count</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {roomData.windows.count} / {maxWindows}
-                      </Badge>
-                    </div>
-                    <Slider
-                      value={[roomData.windows.count]}
-                      onValueChange={([value]) =>
-                        onUpdateRoomData("windows", {
-                          count: Math.round(value),
-                        })
-                      }
-                      min={0}
-                      max={maxWindows}
-                      step={1}
-                      className="h-1"
-                    />
-                  </div>
+                  <CustomSlider
+                    label="Count"
+                    displayValue={roomData.windows.count + "/" + maxWindows}
+                    value={roomData.windows.count}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("windows", {
+                        count: Math.round(value),
+                      })
+                    }
+                    min={0}
+                    max={maxWindows}
+                    step={1}
+                  />
                   {maxWindows === 0 && (
                     <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
                       No windows can be placed. All available walls are adjacent
                       areas.
                     </div>
                   )}
+                  <CustomSlider
+                    label="Width"
+                    displayValue={roomData.windows.width.toFixed(1) + "m"}
+                    value={roomData.windows.width}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("windows", { width: value })
+                    }
+                    min={0.5}
+                    max={3}
+                    step={0.1}
+                  />
+                  <CustomSlider
+                    label="Height"
+                    displayValue={roomData.windows.height.toFixed(1) + "m"}
+                    value={roomData.windows.height}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("windows", { height: value })
+                    }
+                    min={0.5}
+                    max={Math.min(roomData.dimensions.height - 1.2, 2.5)}
+                    step={0.1}
+                  />
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <Label className="text-xs text-gray-600">Width</Label>
-                        <Badge variant="outline" className="text-xs">
-                          {roomData.windows.width.toFixed(1)}m
-                        </Badge>
-                      </div>
-                      <Slider
-                        value={[roomData.windows.width]}
-                        onValueChange={([value]) =>
-                          onUpdateRoomData("windows", { width: value })
-                        }
-                        min={0.5}
-                        max={3}
-                        step={0.1}
-                        className="h-1"
-                      />
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <Label className="text-xs text-gray-600">Height</Label>
-                        <Badge variant="outline" className="text-xs">
-                          {roomData.windows.height.toFixed(1)}m
-                        </Badge>
-                      </div>
-                      <Slider
-                        value={[roomData.windows.height]}
-                        onValueChange={([value]) =>
-                          onUpdateRoomData("windows", { height: value })
-                        }
-                        min={0.5}
-                        max={Math.min(roomData.dimensions.height - 1.2, 2.5)}
-                        step={0.1}
-                        className="h-1"
-                      />
-                    </div>
-                  </div>
 
                   <div>
                     <Label className="text-xs text-gray-600">Glass Type:</Label>
@@ -597,8 +550,6 @@ export default function ControlSidebar({
                   <div>• Adjacent floor affects thermal calculations</div>
                 </div>
               </div>
-
-              
             </TabsContent>
           </div>
         </Tabs>
