@@ -10,7 +10,7 @@ export default function CustomSlider({
   min,
   max,
   step,
-  onChange,
+  onValueChange,
   className = "",
   disabled = false,
   displayValue,
@@ -21,17 +21,14 @@ export default function CustomSlider({
   min: number;
   max: number;
   step: number;
-  onChange: (value: number) => void;
+  onValueChange: (value: number) => void;
   className?: string;
   disabled?: boolean;
   description?: string;
   displayValue?: string;
-  showValue?: boolean;
-  unit?: string;
-  formatValue?: (value: number) => string;
 }) {
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-1.5 ${className}`}>
       <div className="flex justify-between items-center mb-1">
         <Label className="text-xs text-gray-600">{label}</Label>
         {displayValue && (
@@ -43,7 +40,7 @@ export default function CustomSlider({
 
       <Slider
         value={[value]}
-        onValueChange={([newValue]) => onChange(newValue)}
+        onValueChange={([newValue]) => onValueChange(newValue)}
         min={min}
         max={max}
         step={step}

@@ -19,6 +19,7 @@ import {
   roofMaterials,
   doorTypes,
 } from "@/data/materials";
+import CustomSlider from "./custom-slider";
 
 interface ControlSidebarProps {
   roomData: RoomData;
@@ -117,25 +118,17 @@ export default function ControlSidebar({
                       className="h-1"
                     />
                   </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-3">
-                      <Label className="text-xs text-gray-600">Width</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {roomData.dimensions.width}m
-                      </Badge>
-                    </div>
-                    <Slider
-                      value={[roomData.dimensions.width]}
-                      onValueChange={([value]) =>
-                        onUpdateRoomData("dimensions", { width: value })
-                      }
-                      min={2}
-                      max={15}
-                      step={0.5}
-                      className="h-1"
-                    />
-                  </div>
+                  <CustomSlider
+                    label={"Width"}
+                    displayValue={roomData.dimensions.width + "m"}
+                    value={roomData.dimensions.width}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("dimensions", { width: value })
+                    }
+                    min={2}
+                    max={15}
+                    step={0.5}
+                  />
 
                   <div>
                     <div className="flex justify-between items-center mb-1">
