@@ -63,23 +63,23 @@ export default function ControlSidebar({
       <div className="flex-1 flex flex-col min-h-0">
         <Tabs defaultValue="room" className="h-full flex flex-col min-h-0">
           {/* Tab Headers - Responsive */}
-          <div className="border-b border-gray-200 bg-white flex-shrink-0">
+          <div className="border-b border-gray-200 flex-shrink-0">
             <TabsList className="grid w-full grid-cols-3 h-8 sm:h-10 bg-transparent p-0">
               <TabsTrigger
                 value="room"
-                className="text-xs font-medium data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none h-full px-1 sm:px-2"
+                className="text-xs font-medium  data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none  rounded-tl-md h-full px-1 sm:px-2"
               >
                 Room
               </TabsTrigger>
               <TabsTrigger
                 value="windows-doors"
-                className="text-xs font-medium data-[state=active]:bg-green-50 data-[state=active]:text-green-700 data-[state=active]:border-b-2 data-[state=active]:border-green-500 rounded-none h-full px-1 sm:px-2"
+                className="text-xs font-medium  data-[state=active]:text-green-700 data-[state=active]:border-b-2 data-[state=active]:border-green-500 rounded-none h-full px-1 sm:px-2"
               >
                 Windows & Doors
               </TabsTrigger>
               <TabsTrigger
                 value="roof-floor"
-                className="text-xs font-medium data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 data-[state=active]:border-b-2 data-[state=active]:border-purple-500 rounded-none h-full px-1 sm:px-2"
+                className="text-xs font-medium  data-[state=active]:text-purple-700 data-[state=active]:border-b-2  data-[state=active]:border-purple-500 rounded-none rounded-tr-md  h-full px-1 sm:px-2"
               >
                 Roof & Floor
               </TabsTrigger>
@@ -119,7 +119,7 @@ export default function ControlSidebar({
                   </div>
 
                   <div>
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="flex justify-between items-center mb-3">
                       <Label className="text-xs text-gray-600">Width</Label>
                       <Badge variant="outline" className="text-xs">
                         {roomData.dimensions.width}m
