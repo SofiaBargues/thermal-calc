@@ -21,17 +21,14 @@ import {
 } from "@/data/materials";
 import CustomSlider from "./custom-slider";
 
-interface ControlSidebarProps {
-  roomData: RoomData;
-  results: Results | null;
-  onUpdateRoomData: (section: keyof RoomData, data: any) => void;
-}
 
 export default function ControlSidebar({
   roomData,
-  results,
   onUpdateRoomData,
-}: ControlSidebarProps) {
+}:  {
+  roomData: RoomData;
+  onUpdateRoomData: (section: keyof RoomData, data: any) => void;
+} ){
   const getMaxWindows = () => {
     const availableWalls = [];
 
@@ -129,25 +126,17 @@ export default function ControlSidebar({
                     max={15}
                     step={0.5}
                   />
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <Label className="text-xs text-gray-600">Height</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {roomData.dimensions.height}m
-                      </Badge>
-                    </div>
-                    <Slider
-                      value={[roomData.dimensions.height]}
-                      onValueChange={([value]) =>
-                        onUpdateRoomData("dimensions", { height: value })
-                      }
-                      min={2.2}
-                      max={4}
-                      step={0.1}
-                      className="h-1"
-                    />
-                  </div>
+                  <CustomSlider
+                    label={"Height"}
+                    displayValue={roomData.dimensions.height + "m"}
+                    value={roomData.dimensions.height}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("dimensions", { height: value })
+                    }
+                    min={2.2}
+                    max={4}
+                    step={0.1}
+                  />
                 </div>
               </div>
 
@@ -609,23 +598,7 @@ export default function ControlSidebar({
                 </div>
               </div>
 
-              {/* Performance Summary */}
-              {results && (
-                <div className="bg-white rounded-lg p-2 border border-purple-200 flex-shrink-0">
-                  <h3 className="font-medium text-purple-900 mb-1 text-sm">
-                    Performance
-                  </h3>
-                  <div className="text-xs text-gray-600 space-y-1">
-                    <div>
-                      • U-Value: {results.currentUValue.toFixed(2)} W/m²·K
-                    </div>
-                    <div>
-                      • Heat Loss: {results.currentHeatLoss.toFixed(0)} W
-                    </div>
-                    <div>• Energy Score: {results.currentEnergyScore}</div>
-                  </div>
-                </div>
-              )}
+              
             </TabsContent>
           </div>
         </Tabs>

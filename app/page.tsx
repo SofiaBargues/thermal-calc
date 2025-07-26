@@ -48,14 +48,8 @@ export default function ThermalCalculator() {
   const [roomData, setRoomData] = useState<RoomData>(initialRoomData);
 
   // Calculate results in real-time
-  const results = useMemo(() => {
-    try {
-      return calculateThermalPerformance(roomData);
-    } catch (error) {
-      return null;
-    }
-  }, [roomData]);
-
+  const results = calculateThermalPerformance(roomData);
+  
   const updateRoomData = (section: keyof RoomData, data: any) => {
     setRoomData((prev) => ({
       ...prev,
@@ -277,7 +271,7 @@ export default function ThermalCalculator() {
                   <CardContent className="p-0 h-full">
                     <Room3DVisualization
                       roomData={roomData}
-                      results={results}
+                      results={results ? results : undefined}
                     />
                   </CardContent>
                 </Card>
@@ -290,7 +284,6 @@ export default function ThermalCalculator() {
         <div className="w-full xl:w-80 rounded-lg border-2 border-gray-300 min-h-[300px] xl:min-h-0">
           <ControlSidebar
             roomData={roomData}
-            results={results}
             onUpdateRoomData={updateRoomData}
           />
         </div>
