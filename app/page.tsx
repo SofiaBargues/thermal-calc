@@ -152,11 +152,11 @@ export default function ThermalCalculator() {
               </div>
             )}
           </div>
-          <div className=" flex flex-col rounded-md border-2 border-gray-300  w-full lg:min-h-0 ">
+          <div className=" flex flex-col rounded-lg border-2 border-gray-300 w-full lg:min-h-0 ">
             {/* 3D Visualization - Width-constrained square on mobile */}
-            <div className="w-full aspect-square   lg:aspect-auto lg:h-full">
-              <Card className="h-full">
-                <CardContent className="p-0  h-full">
+            <div className="w-full aspect-square lg:aspect-auto lg:h-full">
+              <Card className="h-full border-none">
+                <CardContent className="p-0 h-full">
                   <Room3DVisualization
                     roomData={roomData}
                     results={results ? results : undefined}
