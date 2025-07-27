@@ -9,6 +9,7 @@ import type { RoomData } from "@/types/interfaces";
 import { calculateThermalPerformance } from "@/utils/thermal-calculations";
 import BottomResultsPanel from "@/components/bottom-results-panel";
 import { EnergyEfficiency } from "@/components/energy-efficiency";
+import { Footer } from "@/components/footer";
 
 const initialRoomData: RoomData = {
   dimensions: { length: 4, width: 4, height: 2.5 },
@@ -151,9 +152,8 @@ export default function ThermalCalculator() {
                 </div>
               )}
             </div>
-
-            {/* 3D Visualization - Width-constrained square on mobile */}
-            <div className="flex-1 w-full lg:min-h-0">
+            <div className=" flex flex-col w-full lg:min-h-0 ">
+              {/* 3D Visualization - Width-constrained square on mobile */}
               <div className="w-full aspect-square  lg:aspect-auto lg:h-full">
                 <Card className="h-full">
                   <CardContent className="p-0 h-full">
@@ -164,10 +164,13 @@ export default function ThermalCalculator() {
                   </CardContent>
                 </Card>
               </div>
+              {/* Bottom: Compact Results Panel - Responsive Height */}
+              <div className="flex-shrink-0 min-h-[80px] sm:min-h-[100px] lg:min-h-[120px]">
+                <BottomResultsPanel results={results} roomData={roomData} />
+              </div>
             </div>
           </div>
         </div>
-
         {/* Right: Control Sidebar - Fully Responsive */}
         <div className="w-full xl:w-80 rounded-lg border-2 border-gray-300 min-h-[300px] xl:min-h-0">
           <ControlSidebar
@@ -176,11 +179,7 @@ export default function ThermalCalculator() {
           />
         </div>
       </div>
-
-      {/* Bottom: Compact Results Panel - Responsive Height */}
-      <div className="flex-shrink-0 min-h-[80px] sm:min-h-[100px] lg:min-h-[120px]">
-        <BottomResultsPanel results={results} roomData={roomData} />
-      </div>
+      <Footer />
     </div>
   );
 }
