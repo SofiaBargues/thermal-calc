@@ -1,4 +1,4 @@
-import type { Material, WindowType, DoorType } from "@/types/interfaces"
+import type { Material, WindowType, DoorType } from "@/types/interfaces";
 
 export const wallMaterials: Material[] = [
   {
@@ -25,7 +25,7 @@ export const wallMaterials: Material[] = [
     thermalConductivity: 0.45,
     density: 1200,
   },
-]
+];
 
 export const roofMaterials: Material[] = [
   {
@@ -46,7 +46,59 @@ export const roofMaterials: Material[] = [
     thermalConductivity: 50,
     density: 7800,
   },
-]
+];
+
+export const floorMaterials: Material[] = [
+  {
+    id: "concrete",
+    name: "Concrete Slab",
+    thermalConductivity: 1.4,
+    density: 2300,
+    cost: 8,
+  },
+  {
+    id: "wood",
+    name: "Wood Flooring",
+    thermalConductivity: 0.15,
+    density: 500,
+    cost: 25,
+  },
+  {
+    id: "ceramic",
+    name: "Ceramic Tiles",
+    thermalConductivity: 1.3,
+    density: 2000,
+    cost: 15,
+  },
+  {
+    id: "laminate",
+    name: "Laminate Flooring",
+    thermalConductivity: 0.17,
+    density: 800,
+    cost: 12,
+  },
+  {
+    id: "vinyl",
+    name: "Vinyl Flooring",
+    thermalConductivity: 0.19,
+    density: 1200,
+    cost: 8,
+  },
+  {
+    id: "stone",
+    name: "Natural Stone",
+    thermalConductivity: 2.3,
+    density: 2600,
+    cost: 35,
+  },
+  {
+    id: "engineered_wood",
+    name: "Engineered Wood",
+    thermalConductivity: 0.13,
+    density: 600,
+    cost: 20,
+  },
+];
 
 export const insulationMaterials: Material[] = [
   {
@@ -85,7 +137,7 @@ export const insulationMaterials: Material[] = [
     thermalConductivity: 0.042,
     cost: 8,
   },
-]
+];
 
 export const windowTypes: WindowType[] = [
   {
@@ -108,7 +160,7 @@ export const windowTypes: WindowType[] = [
     name: "Double with Low-E",
     uValue: 2.2,
   },
-]
+];
 
 export const doorTypes: DoorType[] = [
   {
@@ -141,4 +193,4 @@ export const doorTypes: DoorType[] = [
     name: "Composite Insulated Door",
     uValue: 1.2,
   },
-]
+];

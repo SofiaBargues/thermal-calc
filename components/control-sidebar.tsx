@@ -17,6 +17,7 @@ import {
   insulationMaterials,
   windowTypes,
   roofMaterials,
+  floorMaterials,
   doorTypes,
 } from "@/data/materials";
 import CustomSlider from "./custom-slider";
@@ -497,6 +498,99 @@ export default function ControlSidebar({
                 </div>
               </div>
 
+              {/* Floor Configuration */}
+              <div className="bg-white rounded-lg p-2 border border-purple-200 flex-shrink-0">
+                <h3 className="font-medium text-purple-900 mb-2 text-sm">
+                  Floor Configuration
+                </h3>
+                <div className="space-y-2">
+                  <div>
+                    <Label className="text-xs text-gray-600">Material:</Label>
+                    <Select
+                      value={roomData.floor.material}
+                      onValueChange={(value) =>
+                        onUpdateRoomData("floor", { material: value })
+                      }
+                    >
+                      <SelectTrigger className="mt-1 h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {floorMaterials.map((material) => (
+                          <SelectItem
+                            key={material.id}
+                            value={material.id}
+                            className="text-xs"
+                          >
+                            {material.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <CustomSlider
+                    label="Thickness"
+                    displayValue={roomData.floor.thickness.toFixed(2) + "m"}
+                    value={roomData.floor.thickness}
+                    onValueChange={(value) =>
+                      onUpdateRoomData("floor", { thickness: value })
+                    }
+                    min={0.05}
+                    max={0.3}
+                    step={0.01}
+                  />
+
+                  <div>
+                    <Label className="text-xs text-gray-600">Insulation:</Label>
+                    <Select
+                      value={roomData.floor.insulation}
+                      onValueChange={(value) => {
+                        onUpdateRoomData("floor", {
+                          insulation: value,
+                          insulationThickness:
+                            value === "none"
+                              ? 0
+                              : roomData.floor.insulationThickness,
+                        });
+                      }}
+                    >
+                      <SelectTrigger className="mt-1 h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {insulationMaterials.map((material) => (
+                          <SelectItem
+                            key={material.id}
+                            value={material.id}
+                            className="text-xs"
+                          >
+                            {material.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {roomData.floor.insulation !== "none" && (
+                    <>
+                      <CustomSlider
+                        label="Insulation Thickness"
+                        displayValue={
+                          roomData.floor.insulationThickness.toFixed(2) + "m"
+                        }
+                        value={roomData.floor.insulationThickness}
+                        onValueChange={(value) =>
+                          onUpdateRoomData("floor", {
+                            insulationThickness: value,
+                          })
+                        }
+                        min={0.01}
+                        max={0.2}
+                        step={0.01}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
               {/* Floor Info */}
               <div className="bg-white rounded-lg p-2 border border-purple-200 flex-shrink-0">
                 <h3 className="font-medium text-purple-900 mb-1 text-sm">

@@ -36,6 +36,12 @@ const initialRoomData: RoomData = {
     insulation: "eps",
     insulationThickness: 0.08,
   },
+  floor: {
+    material: "concrete",
+    thickness: 0.15,
+    insulation: "eps",
+    insulationThickness: 0.05,
+  },
   adjacentAreas: {
     front: false,
     left: false,
@@ -92,15 +98,15 @@ export default function ThermalCalculator() {
                 </div>
 
                 {/* Efficiency Scale - Responsive Bars */}
-                <div className="flex-1 flex flex-col  p-2 sm:p-3 ">
+                <div className="flex-1 flex flex-col justify-evenly  p-2 sm:p-3 ">
                   <EnergyEfficiency results={results} />
                   {/* Performance Summary - Responsive */}
-                  <div className="mt-auto pt-2 sm:pt-3 border-t border-gray-200 flex-shrink-0">
-                    <div className="flex justify-between items-center gap-2">
+                  <div className="  sm:pt-3 flex-shrink-0">
+                    <div className="flex flex-row md:flex-col justify-center items-center  gap-2 ">
                       {/* Energy Rating Display */}
                       <div className="text-center flex-1">
                         <div
-                          className={`w-8 h-6 sm:w-10 sm:h-8 flex items-center justify-center text-white text-xs sm:text-sm font-bold mx-auto mb-1 sm:mb-2 ${(() => {
+                          className={`w-8 h-6 sm:w-24 sm:h-20 flex items-center justify-center text-white text-xs sm:text-5xl font-bold mx-auto mb-1 sm:mb-2 ${(() => {
                             const currentScore = results.currentEnergyScore;
                             if (currentScore >= 92) return "bg-green-500";
                             if (currentScore >= 81) return "bg-green-600";
@@ -131,8 +137,8 @@ export default function ThermalCalculator() {
                       </div>
 
                       {/* U-Value Display */}
-                      <div className="text-center flex-1">
-                        <div className="text-lg sm:text-2xl font-bold text-blue-600 mb-1 sm:mb-2">
+                      <div className="text-center flex-1 ">
+                        <div className="text-lg sm:text-5xl font-bold text-blue-600 mb-1 sm:mb-2">
                           {results.currentUValue.toFixed(2)}
                         </div>
                         <div className="text-xs font-medium text-gray-700">
