@@ -455,7 +455,7 @@ export default function Room3DVisualization({
   results,
 }: Room3DVisualizationProps) {
   return (
-    <div className="h-full w-full bg-gradient-to-b from-gray-100 to-gray-200">
+    <div className="h-full w-full  bg-gradient-to-b from-gray-100 to-gray-200">
       <Canvas
         camera={{ position: [8, 6, 8], fov: 50 }}
         style={{ background: "transparent" }}
