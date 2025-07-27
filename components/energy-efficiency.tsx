@@ -62,7 +62,7 @@ export function EnergyEfficiency({ results }: { results: Results }) {
   return (
     <div className="space-y-1 sm:space-y-1.5 pr-8 sm:pr-12 mb-2 sm:mb-4 flex-shrink-0">
       {(() => {
-        const currentScore = results.currentEnergyScore;
+        const currentScore = results.energyScore;
 
         return efficiencyLevels.map((level) => {
           const isCurrentRating =

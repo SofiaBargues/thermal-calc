@@ -591,26 +591,7 @@ export default function ControlSidebar({
                   )}
                 </div>
               </div>
-              {/* Floor Info */}
-              <div className="bg-white rounded-lg p-2 border border-purple-200 flex-shrink-0">
-                <h3 className="font-medium text-purple-900 mb-1 text-sm">
-                  Floor
-                </h3>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <div>
-                    • Area:{" "}
-                    {(
-                      roomData.dimensions.length * roomData.dimensions.width
-                    ).toFixed(1)}
-                    m²
-                  </div>
-                  <div>
-                    • Dimensions: {roomData.dimensions.length}m ×{" "}
-                    {roomData.dimensions.width}m
-                  </div>
-                  <div>• Adjacent floor affects thermal calculations</div>
-                </div>
-              </div>
+              
             </TabsContent>
           </div>
         </Tabs>

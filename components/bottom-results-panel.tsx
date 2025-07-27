@@ -6,12 +6,6 @@ interface BottomResultsPanelProps {
   roomData: RoomData;
 }
 
-const SECONDS_PER_HOUR = 60 * 60;
-const SECONDS_PER_YEAR = 60 * 60 * 24 * 365;
-function calculateEnergy(watts: number, seconds: number) {
-  return watts * seconds;
-}
-
 export default function BottomResultsPanel({
   results,
   roomData,
@@ -19,7 +13,7 @@ export default function BottomResultsPanel({
   if (!results) return null;
 
   const floorArea = roomData.dimensions.length * roomData.dimensions.width;
-  const co2Impact = (results.currentHeatLoss * 0.0002 * 2000).toFixed(0); // Approximate CO2 per year
+  const co2Impact = (results.heatLoss * 0.0002 * 2000).toFixed(0); // Approximate CO2 per year
 
   // Calculate efficiency rating
   const getEfficiencyRating = (score: number) => {
@@ -32,7 +26,7 @@ export default function BottomResultsPanel({
     return { rating: "G", bgColor: "bg-red-700" };
   };
 
-  const currentRating = getEfficiencyRating(results.currentEnergyScore);
+  const currentRating = getEfficiencyRating(results.energyScore);
 
   return (
     <div className="bg-white rounded-b-md h-full min-h-0">
@@ -52,9 +46,8 @@ export default function BottomResultsPanel({
             <div className="text-center">
               <div className="text-xs text-gray-700">Heat Loss</div>
               <div className="text-sm sm:text-lg lg:text-2xl font-bold text-red-600">
-                {results.currentHeatLoss.toFixed(0)}W
+                {results.heatLoss.toFixed(0)}W
               </div>
-             
             </div>
 
             {/* Energy Consumption */}
@@ -63,14 +56,9 @@ export default function BottomResultsPanel({
                 Yearly energy consumption{" "}
               </div>
               <div className="text-sm sm:text-lg lg:text-2xl font-bold text-orange-600">
-                {(
-                  calculateEnergy(results.currentHeatLoss, SECONDS_PER_YEAR) /
-                  SECONDS_PER_HOUR /
-                  1000
-                ).toFixed(0)}
+                {results.energyConsumptionPerYear.toFixed(0)}
                 kWh
               </div>
-             
             </div>
           </div>
         </div>

@@ -107,7 +107,7 @@ export default function ThermalCalculator() {
                       <div className="text-center flex-1">
                         <div
                           className={`w-8 h-6 sm:w-24 sm:h-20 flex items-center justify-center text-white text-xs sm:text-5xl font-bold mx-auto mb-1 sm:mb-2 ${(() => {
-                            const currentScore = results.currentEnergyScore;
+                            const currentScore = results.energyScore;
                             if (currentScore >= 92) return "bg-green-500";
                             if (currentScore >= 81) return "bg-green-600";
                             if (currentScore >= 69) return "bg-lime-500";
@@ -118,7 +118,7 @@ export default function ThermalCalculator() {
                           })()}`}
                         >
                           {(() => {
-                            const currentScore = results.currentEnergyScore;
+                            const currentScore = results.energyScore;
                             if (currentScore >= 92) return "A";
                             if (currentScore >= 81) return "B";
                             if (currentScore >= 69) return "C";
@@ -132,14 +132,14 @@ export default function ThermalCalculator() {
                           Energy Rating
                         </div>
                         <div className="text-xs text-gray-500">
-                          Score: {results.currentEnergyScore}
+                          Score: {results.energyScore}
                         </div>
                       </div>
 
                       {/* U-Value Display */}
                       <div className="text-center flex-1 ">
                         <div className="text-lg sm:text-5xl font-bold text-blue-600 mb-1 sm:mb-2">
-                          {results.currentUValue.toFixed(2)}
+                          {results.uValue.toFixed(2)}
                         </div>
                         <div className="text-xs font-medium text-gray-700">
                           U-Value

@@ -1,3 +1,21 @@
+/**
+ * Energy Performance Score Calculation
+ *
+ * NOTE: This is a simplified approximation of UK EPC ratings. Specially focused on "Heat Loss".
+ * For official EPC certification, use SAP 10.2 methodology with:
+ * - Regulated energy use only (heating, DHW, lighting, ventilation)
+ * - Official SAP fuel cost factors
+ * - Standard occupancy patterns
+ * - Regional climate data
+ * - Approved calculation software
+ *
+ * This calculation provides indicative ratings for comparison purposes.
+ *
+ * Reference: https://www.gov.uk/guidance/standard-assessment-procedure
+ * BRE Domestic Energy Model (BREDEM): https://files.bregroup.com/bre-co-uk-file-library-copy/filelibrary/bredem/BREDEM-2012-specification.pdf
+ *
+ */
+
 import type { RoomData, Results } from "@/types/interfaces";
 import {
   wallMaterials,
@@ -7,15 +25,26 @@ import {
   windowTypes,
   doorTypes,
 } from "@/data/materials";
+import {
+  calculateThermalResistance,
+  calculateFabricHeatLoss as calculateTotalFabricHeatLoss,
+  calculateUValue,
+  adjustWindowUValueForCurtains,
+  calculateFabricHeatLossElements,
+  calculateThermalBridgingLoss,
+  calculateEnergyScoreFromConsumption,
+} from "./thermal-calculation-functions";
+import {
+  RSI_INTERNAL,
+  RSO_EXTERNAL,
+  THERMAL_BRIDGE_FACTORS,
+  TEMPERATURE_DIFFERENCE,
+  HEATING_HOURS,
+  SYSTEM_EFFICIENCY,
+} from "./calculation-constants";
 
 export function calculateThermalPerformance(roomData: RoomData): Results {
   const { dimensions, walls, windows, door, floor, roof } = roomData;
-
-  // Constants
-  const TEMPERATURE_DIFFERENCE = 20; // ΔT = 20°C
-  const HEATING_HOURS = 2000; // Hours per year
-  const ENERGY_COST = 0.15; // USD per kWh
-  const SYSTEM_EFFICIENCY = 0.85;
 
   // Get material properties
   const wallMaterial = wallMaterials.find((m) => m.id === walls.material);
@@ -38,142 +67,185 @@ export function calculateThermalPerformance(roomData: RoomData): Results {
     !wallInsulation ||
     !roofMaterial ||
     !roofInsulation ||
-    !floorMaterials ||
+    !floorMaterial ||
+    !floorInsulation ||
     !windowType ||
     !doorType
   ) {
     throw new Error("Material not found");
   }
+  // At least one non-adjacent wall available for windows?
+  const hasAvailableWallForWindows =
+    !roomData.adjacentAreas?.front ||
+    !roomData.adjacentAreas?.back ||
+    !roomData.adjacentAreas?.left ||
+    !roomData.adjacentAreas?.right;
 
-  // Calculate areas - exclude adjacent walls from heat loss calculations
-  const wallArea =
+  // Window area (only on non-adjacent walls)
+  const windowArea = hasAvailableWallForWindows
+    ? windows.count * windows.width * windows.height
+    : 0;
+
+  // Door area (only on front wall if not adjacent)
+  const doorArea = roomData.adjacentAreas?.front ? 0 : door.width * door.height;
+
+  // PHYSICAL AREA CALCULATIONS
+  // Total wall area (all four walls ignoring windows and doors)
+  const totalWallArea =
     2 * (dimensions.length + dimensions.width) * dimensions.height;
 
-  // Count available walls for windows (non-adjacent only)
-  const availableWallsForWindows = [];
+  const roofArea = dimensions.length * dimensions.width;
+  const floorArea = dimensions.length * dimensions.width;
+
+  // THERMAL CALCULATIONS (only for areas exposed to exterior)
+  // Determine which areas contribute to heat loss
+  const externalAreas = {
+    walls: 0,
+    windows: 0,
+    door: 0,
+    roof: 0,
+    floor: 0,
+  };
+
+  // Only count wall areas exposed to exterior
   if (!roomData.adjacentAreas?.front)
-    availableWallsForWindows.push(dimensions.length);
+    externalAreas.walls += dimensions.length * dimensions.height;
   if (!roomData.adjacentAreas?.back)
-    availableWallsForWindows.push(dimensions.length);
+    externalAreas.walls += dimensions.length * dimensions.height;
   if (!roomData.adjacentAreas?.left)
-    availableWallsForWindows.push(dimensions.width);
+    externalAreas.walls += dimensions.width * dimensions.height;
   if (!roomData.adjacentAreas?.right)
-    availableWallsForWindows.push(dimensions.width);
+    externalAreas.walls += dimensions.width * dimensions.height;
 
-  // Windows can only be placed on non-adjacent walls
-  const windowArea =
-    availableWallsForWindows.length > 0
-      ? windows.count * windows.width * windows.height
-      : 0;
+  // Remove openings from thermal wall area
+  externalAreas.walls = Math.max(
+    0,
+    externalAreas.walls - windowArea - doorArea
+  );
 
-  // Door area (always on front wall)
-  const doorArea = door.width * door.height;
+  // Windows and doors only contribute if on exterior walls
+  externalAreas.windows = windowArea;
+  externalAreas.door = doorArea;
 
-  // Only count walls that are exposed to exterior for thermal calculations
-  let thermalWallArea = wallArea;
-  if (roomData.adjacentAreas?.front)
-    thermalWallArea -= dimensions.length * dimensions.height;
-  if (roomData.adjacentAreas?.back)
-    thermalWallArea -= dimensions.length * dimensions.height;
-  if (roomData.adjacentAreas?.left)
-    thermalWallArea -= dimensions.width * dimensions.height;
-  if (roomData.adjacentAreas?.right)
-    thermalWallArea -= dimensions.width * dimensions.height;
+  // Roof only contributes if ceiling is not adjacent to heated space
+  externalAreas.roof = roomData.adjacentAreas?.ceiling ? 0 : roofArea;
 
-  const netWallArea = Math.max(0, thermalWallArea - windowArea - doorArea);
+  // Floor only contributes if floor is not adjacent to heated space (e.g., over unheated basement or ground)
+  externalAreas.floor = roomData.adjacentAreas?.floor ? 0 : floorArea;
 
-  // Roof area calculation - only if ceiling is not adjacent to heated space
-  const roofArea = roomData.adjacentAreas?.ceiling
-    ? 0
-    : dimensions.length * dimensions.width;
+  // Calculate thermal resistances using surface resistance parameters
+  const wallResistance = calculateThermalResistance({
+    baseThickness: walls.thickness,
+    baseConductivity: wallMaterial.thermalConductivity,
+    rsiInternal: RSI_INTERNAL,
+    rsoExternal: RSO_EXTERNAL,
+    insulationThickness:
+      walls.insulation === "none" ? undefined : walls.insulationThickness,
+    insulationConductivity:
+      walls.insulation === "none"
+        ? undefined
+        : wallInsulation.thermalConductivity,
+  });
 
-  // Calculate thermal resistance (R-values) - using current configuration with insulation
-  const wallResistance =
-    walls.insulation === "none"
-      ? walls.thickness / wallMaterial.thermalConductivity
-      : walls.thickness / wallMaterial.thermalConductivity +
-        walls.insulationThickness / wallInsulation.thermalConductivity;
+  const roofResistance = calculateThermalResistance({
+    baseThickness: roof.thickness,
+    baseConductivity: roofMaterial.thermalConductivity,
+    rsiInternal: RSI_INTERNAL,
+    rsoExternal: RSO_EXTERNAL,
+    insulationThickness:
+      roof.insulation === "none" ? undefined : roof.insulationThickness,
+    insulationConductivity:
+      roof.insulation === "none"
+        ? undefined
+        : roofInsulation.thermalConductivity,
+  });
 
-  const roofResistance =
-    roof.insulation === "none"
-      ? roof.thickness / roofMaterial.thermalConductivity
-      : roof.thickness / roofMaterial.thermalConductivity +
-        roof.insulationThickness / roofInsulation.thermalConductivity;
+  const floorResistance = calculateThermalResistance({
+    baseThickness: floor.thickness,
+    baseConductivity: floorMaterial.thermalConductivity,
+    rsiInternal: RSI_INTERNAL,
+    rsoExternal: RSO_EXTERNAL,
+    insulationThickness:
+      floor.insulation === "none" ? undefined : floor.insulationThickness,
+    insulationConductivity:
+      floor.insulation === "none"
+        ? undefined
+        : floorInsulation.thermalConductivity,
+  });
 
-  const floorResistance =
-    floor.insulation === "none"
-      ? floor.thickness / floorMaterial.thermalConductivity
-      : floor.thickness / floorMaterial.thermalConductivity +
-        floor.insulationThickness / floorInsulation.thermalConductivity;
-
-  // Calculate U-values (thermal transmittance)
-  const wallU = 1 / wallResistance;
-  const roofU = 1 / roofResistance;
-  const floorU = 1 / floorResistance;
-  const windowU = windowType.uValue;
+  // Calculate U-values
+  const wallU = calculateUValue(wallResistance);
+  const roofU = calculateUValue(roofResistance);
+  const floorU = calculateUValue(floorResistance);
+  const windowU = adjustWindowUValueForCurtains(windowType.uValue);
   const doorU = doorType.uValue;
 
-  // Calculate weighted average U-values - only for surfaces exposed to exterior
-  const totalArea = netWallArea + windowArea + doorArea + roofArea;
+  // Calculate total thermal area for thermal bridging (gross building envelope area exposed to exterior)
+  const totalExternalArea =
+    externalAreas.walls +
+    externalAreas.windows +
+    externalAreas.door +
+    externalAreas.roof +
+    externalAreas.floor;
+  const bridgingExternalArea = externalAreas.door + externalAreas.windows;
 
   // Prevent division by zero
-  if (totalArea === 0) {
+  if (totalExternalArea === 0) {
     return {
-      currentUValue: 0,
-      improvedUValue: 0,
-      currentHeatLoss: 0,
-      improvedHeatLoss: 0,
-      energySaving: 0,
-      costSaving: 0,
-      currentEnergyScore: 92,
-      improvedEnergyScore: 92,
+      uValue: 0,
+      heatLoss: 0,
+      energyScore: 100,
+      energyConsumptionPerYear: 0, // kWh/year
     };
   }
 
+  // SAP Fabric Heat Loss Calculation: HF = (ΣAi × Ui) + HTB
+  const fabricElementsHeatLoss = calculateFabricHeatLossElements([
+    { area: externalAreas.walls, uValue: wallU },
+    { area: externalAreas.windows, uValue: windowU },
+    { area: externalAreas.door, uValue: doorU },
+    { area: externalAreas.roof, uValue: roofU },
+    { area: externalAreas.floor, uValue: floorU },
+  ]);
+
+  // Use thermal bridge factor on gross building envelope area exposed to exterior
+  const thermalBridgingLoss = calculateThermalBridgingLoss({
+    totalExternalArea: bridgingExternalArea,
+    thermalBridgeFactor: THERMAL_BRIDGE_FACTORS.post2006,
+  });
+
+  const totalHeatLoss = calculateTotalFabricHeatLoss(
+    fabricElementsHeatLoss,
+    thermalBridgingLoss
+  );
+
+  // Calculate weighted average U-value for comparison purposes
+  // Use total building envelope area (including non-thermal areas as reference)
+  const totalBuildingEnvelopeArea = totalWallArea + roofArea + floorArea;
   const currentUValue =
-    (netWallArea * wallU +
-      windowArea * windowU +
-      doorArea * doorU +
-      roofArea * roofU) /
-    totalArea;
+    totalBuildingEnvelopeArea > 0
+      ? totalHeatLoss / totalBuildingEnvelopeArea
+      : 0;
 
-  // Calculate heat loss (Q = U × A × ΔT)
-  const currentHeatLoss = currentUValue * totalArea * TEMPERATURE_DIFFERENCE;
+  // Calculate heat loss (Q = HF × ΔT) in Watts
+  const currentHeatLoss = totalHeatLoss * TEMPERATURE_DIFFERENCE;
 
-  // Calculate energy consumption
+  // Calculate energy consumption (E = Q × t_heating / η_system)
   const currentEnergyConsumption =
     (currentHeatLoss * HEATING_HOURS) / (1000 * SYSTEM_EFFICIENCY); // kWh
 
   // Calculate Energy Efficiency Score (1-92+ scale)
-  const floorArea = dimensions.length * dimensions.width;
   const currentEnergyPerM2 = currentEnergyConsumption / floorArea; // kWh/m²/year
 
-  // Convert energy consumption to efficiency score (1-92+ scale)
-  const calculateEnergyScore = (energyPerM2: number): number => {
-    if (energyPerM2 <= 15) return Math.min(92, Math.max(92, 107 - energyPerM2)); // A: 92+
-    if (energyPerM2 <= 25) return Math.max(81, 96 - energyPerM2); // B: 81-91
-    if (energyPerM2 <= 50) return Math.max(69, 94 - energyPerM2); // C: 69-80
-    if (energyPerM2 <= 90) return Math.max(55, 90 - (energyPerM2 - 50) * 0.875); // D: 55-68
-    if (energyPerM2 <= 150)
-      return Math.max(39, 70 - (energyPerM2 - 90) * 0.517); // E: 39-54
-    if (energyPerM2 <= 230)
-      return Math.max(21, 54 - (energyPerM2 - 150) * 0.413); // F: 21-38
-    return Math.max(1, 38 - (energyPerM2 - 230) * 0.185); // G: 1-20
-  };
-
   const currentEnergyScore = Math.round(
-    calculateEnergyScore(currentEnergyPerM2)
+    calculateEnergyScoreFromConsumption(currentEnergyPerM2)
   );
 
   // For compatibility, set improved values same as current (since we're showing current config)
   return {
-    currentUValue,
-    improvedUValue: currentUValue,
-    currentHeatLoss,
-    improvedHeatLoss: currentHeatLoss,
-    energySaving: 0,
-    costSaving: 0,
-    currentEnergyScore,
-    improvedEnergyScore: currentEnergyScore,
+    uValue: currentUValue,
+    heatLoss: currentHeatLoss,
+    energyScore: currentEnergyScore,
+    energyConsumptionPerYear: currentEnergyConsumption, // kWh/year
   };
 }

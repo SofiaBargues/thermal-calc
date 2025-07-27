@@ -30,12 +30,7 @@ function Room3D({
     return "#ef4444"; // Red - Poor
   };
 
-  const wallColor = results
-    ? getEfficiencyColor(results.currentUValue)
-    : "#f97316";
-  const improvedWallColor = results
-    ? getEfficiencyColor(results.improvedUValue)
-    : "#22c55e";
+  const wallColor = results ? getEfficiencyColor(results.uValue) : "#f97316";
   const adjacentColor = "#94a3b8"; // Gray for adjacent areas
 
   // Limited rotation to maintain isometric perspective
@@ -368,11 +363,7 @@ function Room3D({
                 walls.insulationThickness / 2,
             ]}
           >
-            <meshStandardMaterial
-              color={improvedWallColor}
-              opacity={0.3}
-              transparent
-            />
+            <meshStandardMaterial color={wallColor} opacity={0.3} transparent />
           </Box>
 
           {/* Back Wall Insulation */}
@@ -390,11 +381,7 @@ function Room3D({
                 walls.insulationThickness / 2,
             ]}
           >
-            <meshStandardMaterial
-              color={improvedWallColor}
-              opacity={0.3}
-              transparent
-            />
+            <meshStandardMaterial color={wallColor} opacity={0.3} transparent />
           </Box>
 
           {/* Left Wall Insulation (only if not adjacent) */}
@@ -414,7 +401,7 @@ function Room3D({
               ]}
             >
               <meshStandardMaterial
-                color={improvedWallColor}
+                color={wallColor}
                 opacity={0.3}
                 transparent
               />
@@ -438,7 +425,7 @@ function Room3D({
               ]}
             >
               <meshStandardMaterial
-                color={improvedWallColor}
+                color={wallColor}
                 opacity={0.3}
                 transparent
               />

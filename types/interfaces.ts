@@ -11,8 +11,6 @@ export interface WallConfig {
   insulationThickness: number;
 }
 
-
-
 export interface WindowConfig {
   count: number;
   width: number;
@@ -58,14 +56,10 @@ export interface RoomData {
 }
 
 export interface Results {
-  currentUValue: number;
-  improvedUValue: number;
-  currentHeatLoss: number;
-  improvedHeatLoss: number;
-  energySaving: number;
-  costSaving: number;
-  currentEnergyScore: number;
-  improvedEnergyScore: number;
+  uValue: number;
+  heatLoss: number;
+  energyScore: number;
+  energyConsumptionPerYear: number; // kWh/year
 }
 
 export interface Material {
