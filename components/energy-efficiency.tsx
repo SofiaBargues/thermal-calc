@@ -112,7 +112,9 @@ export function EnergyEfficiency({ results }: { results: Results }) {
         })()}
       </div>
       <h2 className="text-xs">{"Energy Performance Certificate"}</h2>
-      <p className="text-muted-foreground text-xs">Approximate Bands</p>
+      <p className="text-muted-foreground text-xs">
+        {"Approximate Bands [kWh/(m^2)]"}
+      </p>
     </div>
   );
 }
