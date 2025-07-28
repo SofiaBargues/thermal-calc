@@ -19,6 +19,9 @@ export const HEATING_HOURS = 2000;
  * 0.85 represents typical condensing boiler efficiency
  */
 export const SYSTEM_EFFICIENCY = 0.85;
+
+
+
 /**
  * THERMAL RESISTANCE SYMBOLS (m²K/W)
  * Surface resistances per BS EN ISO 6946
@@ -27,9 +30,6 @@ export const SYSTEM_EFFICIENCY = 0.85;
  * Rsi - Internal surface resistance (m²K/W)
  * Standard value for still air adjacent to internal building surfaces
  */
-
-
-
 export const RSI_INTERNAL = 0.13;
 /**
  * Rso - External surface resistance (m²K/W)
